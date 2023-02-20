@@ -1,4 +1,5 @@
 import mongoose, { mongo } from 'mongoose';
+import { boolean } from 'webidl-conversions';
 
 const { Schema, model } = mongoose;
 
@@ -27,7 +28,13 @@ const userSchema = new Schema({
     birthDate: {
         type: Date
     },
+    verified: {
+        type: Boolean
     },
+    otp: {
+        type: Number
+    }
+},
     {
         timestamps: true
     });
