@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
-import userRoutes from "./routes/User.route.js";
+import gameRoutes from "./routes/gameRoutes.js";
 
 import { NotFoundError, errorHandler } from "./middlewares/error-handler.js";
 import morgan from "morgan";
@@ -10,7 +10,7 @@ const app = express();
 
 dotenv.config();
 // badel hedhi ki bech taamel docker-compose up DOCKERSERVERURL
-const hostname = process.env.SERVERURL;
+const hostname = process.env.DOCKERSERVERURL;
 const port = process.env.SERVERPORT;
 
 //info on req : GET /route ms -25
@@ -24,7 +24,7 @@ app.use("/media", express.static("media"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/user", userRoutes);
+app.use("/game", gameRoutes);
 
 app.use(NotFoundError);
 app.use(errorHandler);

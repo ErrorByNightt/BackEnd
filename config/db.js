@@ -5,7 +5,7 @@ dotenv.config();
 
 const databaseName = process.env.DBNAME;
 // badel hedhi ki bech taamel docker-compose up DOCKERDBURL
-const databaseURL = process.env.DBURL;
+const databaseURL = process.env.DOCKERDBURL;
 mongoose.set("debug", true);
 mongoose.Promise = global.Promise;
 
@@ -13,7 +13,7 @@ const connectDb = () => {
   mongoose
     .connect(`mongodb://${databaseURL}/${databaseName}`)
     .then(() => {
-      console.log(`Connected to ${databaseName}`);
+      console.log(`Connected to database`);
     })
     .catch((err) => {
       console.log(err);
