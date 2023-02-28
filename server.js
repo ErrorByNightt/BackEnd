@@ -1,35 +1,39 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import * as dotenv from "dotenv";
-import userRoutes from "./routes/userRoutes.js";
-import faintRoutes from "./routes/faintRoutes.js";
+import user from './routes/User.route.js';
+import courses from './routes/Courses.route.js';
 
+
+import { NotFoundError, errorHandler } from "./middlewares/error-handler.js";
+import morgan from "morgan";
+import connectDb from "./config/db.js";
 const app = express();
 
 dotenv.config();
-const hostname = process.env.DEVURL;
-const port = process.env.PORT;
-const databaseName = process.env.DBNAME;
-const databaseURL = process.env.DBURL;
-mongoose.set("debug", true);
-mongoose.Promise = global.Promise;
+// badel hedhi ki bech taamel docker-compose up DOCKERSERVERURL
+const hostname = process.env.DOCKERSERVERURL;
+const port = process.env.SERVERPORT;
 
-mongoose
-  .connect(`mongodb://${databaseURL}/${databaseName}`)
-  .then(() => {
-    console.log(`Connected to database`);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+//info on req : GET /route ms -25
+app.use(morgan("tiny"));
 
 app.use(cors());
+connectDb();
+//bech taati acces lel dossier media li fih les images, localhost:9095/media/fifa.jpg
+app.use("/media/profile", express.static("media"));
+//app.use("/media/courses", express.static("courses"));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/user", userRoutes);
-app.use("/faint", faintRoutes);
+
+//BSH TESTI 
+app.use("/user", user);
+app.use("/courses", courses);
+
+app.use(NotFoundError);
+app.use(errorHandler);
 
 app.listen(port, hostname, () => {
-  console.log(`Server running`);
+  console.log(`Server running on ${hostname}:${port}`);
 });
