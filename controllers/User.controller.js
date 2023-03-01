@@ -23,10 +23,10 @@ export async function register(req, res, next) {
 
   let user = new User({
     fullName,
-    userName: req.body.userName,
+    userName,
     //image: `${req.protocol}://${req.get('host')}/media/profile/${req.body.image}`,
-    mail: req.body.mail,
-    password: req.body.password,
+    mail,
+    password,
     birthDate,
     balance,
     friends,
@@ -128,13 +128,13 @@ export async function register(req, res, next) {
 
 //Login
 export async function login(req, res) {
-  const { email, password } = req.body
-  console.log("email", email)
-  if (!(email && password)) {
+  const { mail, password } = req.body
+  console.log("email", mail)
+  if (!(mail && password)) {
     res.status(400).send('Required Input')
   }
 
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ mail })
 
 
   //if (user && (await bcrypt.compare(password, user.password))) {
@@ -159,13 +159,13 @@ export async function login(req, res) {
 
 //Update pwd 
 export async function updatePassword(req, res) {
-  const { email, newPassword } = req.body
+  const { mail, newPassword } = req.body
 
   if (newPassword) {
     newPasswordEncrypted = await bcrypt.hash(newPassword, 10)
 
     let user = await user.findOneAndUpdate(
-      { email: email },
+      { mail: mail },
       {
         $set: {
           password: newPasswordEncrypted,
@@ -184,7 +184,7 @@ export async function updatePassword(req, res) {
 // Send OTP
 export async function sendOTP(req, res) {
   var email = req.body.mail
-  const user = await User.findOne({ email: email })
+  const user = await User.findOne({ mail: email })
   let transport = nodemailer.createTransport({
     service: "gmail",
     auth: {
