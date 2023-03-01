@@ -5,7 +5,7 @@ dotenv.config();
 
 const databaseName = process.env.DBNAME;
 // badel hedhi ki bech taamel docker-compose up DOCKERDBURL
-const databaseURL = process.env.DOCKERDBURL;
+const databaseURL = process.env.DBURL;
 mongoose.set("debug", true);
 mongoose.Promise = global.Promise;
 

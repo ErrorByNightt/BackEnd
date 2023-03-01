@@ -5,7 +5,7 @@ const { Schema, model } = mongoose;
 const userSchema = new Schema({
     fullName: {
         type: String,
-        required: true,
+        required: false,
     },
     image: {
         type: String,
@@ -13,18 +13,18 @@ const userSchema = new Schema({
 
     userName: {
         type: String,
-        required: true,
+        required: false,
     },
     Image: {
         type: String
     },
     mail: {
         type: String,
-        required: true,
+        required: false,
     },
     password: {
         type: String,
-        required: true,
+        required: false,
     },
     balance: {
         type: Number
@@ -34,7 +34,7 @@ const userSchema = new Schema({
     },
     birthDate: {
         type: Date,
-        required: true,
+        required: false,
     },
     rank: {
         type: String,

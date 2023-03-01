@@ -12,7 +12,7 @@ const app = express();
 
 dotenv.config();
 // badel hedhi ki bech taamel docker-compose up DOCKERSERVERURL
-const hostname = process.env.DOCKERSERVERURL;
+const hostname = process.env.SERVERURL;
 const port = process.env.SERVERPORT;
 
 //info on req : GET /route ms -25

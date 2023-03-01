@@ -13,13 +13,55 @@ import * as dotenv from 'dotenv'
 //Add User
 
 export async function register(req, res, next) {
-  const emailValid = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+  const { fullName, mail, password, userName, balance, birthDate, friends, achievements, badges, courses, gamesPlayed } = req.body
+
+  const existUser = await User.findOne({ mail: req.body.mail })
+
+  if (existUser) {
+    return res.status(409).send("Address Already exist")
+  }
+
+  let user = new User({
+    fullName,
+    userName: req.body.userName,
+    //image: `${req.protocol}://${req.get('host')}/media/profile/${req.body.image}`,
+    mail: req.body.mail,
+    password: req.body.password,
+    birthDate,
+    balance,
+    friends,
+    rank: "Unranked",
+    etat: "active",
+    friends,
+    achievements,
+    badges,
+    courses,
+    gamesPlayed,
+    otp: parseInt(Math.random() * 10000),
+    isVerified: true
+  })
+
+  user
+    .save()
+    .then(user => {
+      sendOTP(user.mail)
+      res.status(200).json(user)
+    })
+    .catch(err => {
+      res.json({
+        error: err
+      })
+    })
+
+
+
+  /*const emailValid = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
   try {
-    const { fullname, email, password, userName, balance, birthDate, friends, achievements, badges, courses, gamesPlayed } = req.body
+    const { fullname, mail, password, userName, balance, birthDate, friends, achievements, badges, courses, gamesPlayed } = req.body
 
-    console.log(fullname, email)
+    console.log(mail)
 
-    if (!(
+    /*if (!(
       fullname &&
       email &&
       password &&
@@ -28,56 +70,59 @@ export async function register(req, res, next) {
       //res.status(400).send('Required Inputs')
       console.log("inputs required")
       return res.status(400).send({ message: 'Required Inputs' })
-    }
+    }*/
 
-    if (emailValid.test(email) == false) {
-      console.log("email invalid")
-      return res.status(400).send({ message: 'email invalid' })
-      //res.status(400).send('email invalid')
-      //return
-    }
-
-    //checking the existance of user
-    if (await User.findOne({ email })) {
-      return res.status(403).send({ message: "User already exist !" })
-    } else {
-
-      let user = await new User({
-        fullname,
-        userName,
-        image: `${req.protocol}://${req.get('host')}/media/profile/${req.body.image}`,
-        email,
-        password: await bcrypt.hash(password, 10),
-        birthDate,
-        balance,
-        friends,
-        rank: "Unranked",
-        etat: "active",
-        friends,
-        achievements,
-        badges,
-        courses,
-        gamesPlayed,
-        otp: parseInt(Math.random() * 10000),
-        isVerified: true
-      })
-      user.save()
-        .then(user => {
-          sendEmailtest(user.email, user.otp)
-          return res.json({
-            message: 'User added successfully!'
-          })
-        })
-        .catch(error => {
-          return res.json({
-            message: 'An error occured!'
-          })
-        })
-    }//res.send(user)
-  } catch (err) {
-    console.log(err)
-    return res.send(err)
+  /*
+  if (emailValid.test(email) == false) {
+    console.log("email invalid")
+    return res.status(400).send({ message: 'email invalid' })
+    //res.status(400).send('email invalid')
+    //return
   }
+  */
+  /*
+  //checking the existance of user
+  if (await User.findOne({ mail })) {
+    return res.status(403).send({ message: "User already exist !" })
+  } else {
+
+    let user = new User({
+      fullname,
+      userName,
+      //image: `${req.protocol}://${req.get('host')}/media/profile/${req.body.image}`,
+      mail,
+      password,
+      birthDate,
+      balance,
+      friends,
+      rank: "Unranked",
+      etat: "active",
+      friends,
+      achievements,
+      badges,
+      courses,
+      gamesPlayed,
+      otp: parseInt(Math.random() * 10000),
+      isVerified: true
+    })
+    user.save()
+      .then(user => {
+        sendOTP()
+        return res.status(200).json({
+          message: 'User added successfully!'
+        })
+      })
+      .catch(error => {
+        return res.json({
+          message: 'An error occured!'
+        })
+      })
+  }//res.send(user)
+} catch (err) {
+  console.log(err)
+  return res.send(err)
+}
+*/
 }
 
 
@@ -92,16 +137,17 @@ export async function login(req, res) {
   const user = await User.findOne({ email })
 
 
-  if (user && (await bcrypt.compare(password, user.password))) {
-    const token = generateUserToken(user)
-    console.log("token = ", token)
+  //if (user && (await bcrypt.compare(password, user.password))) {
+  if (user) {
+    //const token = generateUserToken(user)
+    //console.log("token = ", token)
 
-    if (!user.isVerified) {
+    if (!user.verified) {
       return res.status(403).send({ user, message: "email non verifié" })
     } else {
       dotenv.config()
 
-      return res.status(200).send({ token, user, message: "success" })
+      return res.status(200).send({ user, message: "success" })
     }
   } else {
     return res.status(403).send({ message: "mot de passe ou email incorrect" })
@@ -136,21 +182,35 @@ export async function updatePassword(req, res) {
 
 
 // Send OTP
-export async function sendOTP(email) {
+export async function sendOTP(req, res) {
+  var email = req.body.mail
   const user = await User.findOne({ email: email })
-  sendEmailOTP({
-    from: process.env.ninja_mail,
-    to: email,
-    subject: "Password reset",
-    template: 'otp',
-    context: {
-      OTP: user.otp
-    }
+  let transport = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "mohameddhiabenamar@gmail.com",
+      pass: "vdgtzxjehksifknu",
+    },
   })
+  const mailOptions = {
+    from: 'mohameddhiabenamar@gmail', // Sender address
+    to: email, // List of recipients
+    subject: "Password reset",
+    template: 'otp',// Plain text body
+    text: user.otp.toString()
+  };
+
+  transport.sendMail(mailOptions, function (err, info) {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log(info);
+    }
+  });
 }
 
 //Send Confirmation email
-export async function sendEmail(mailOptions) {
+/*export async function sendEmail(mailOptions) {
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -185,7 +245,7 @@ export async function sendEmail(mailOptions) {
       console.log('Email sent: ' + info.response)
     }
   })
-}
+}*/
 
 export async function confirmation(req, res) {
   if (req.params.token) {
@@ -220,29 +280,29 @@ export async function confirmation(req, res) {
 
 
 // RESET PWD 
-export async function resetPassword(req,res) {
+export async function resetPassword(req, res) {
   const email = req.body.email
   const newPass = req.body.newPass
-  console.log("newPass = ",newPass)
+  console.log("newPass = ", newPass)
   const otp = req.body.otp
-  const user = await User.findOne({ email: email ,otp: otp })
-    if (user) {
-        user.password = await bcrypt.hash(newPass, 10)
-        user.save().then(() => {
-          res.status(200).json({"message": "user password changed"})
-        }).catch(() => {
-          res.status(400).json({"error": "error"})
-        })
-    } else {
-      res.status(400).json({"error": "error"})
-    }
+  const user = await User.findOne({ email: email, otp: otp })
+  if (user) {
+    user.password = await bcrypt.hash(newPass, 10)
+    user.save().then(() => {
+      res.status(200).json({ "message": "user password changed" })
+    }).catch(() => {
+      res.status(400).json({ "error": "error" })
+    })
+  } else {
+    res.status(400).json({ "error": "error" })
+  }
 }
 
 // FORGOT PWD
 
-export async function forgotPassword (req, res) {
-  let OTP = otpGenerator.generate(4,{upperCaseAlphabets:false,specialChars:false,digits:true,lowerCaseAlphabets:false})
-  const user = await User.findOneAndUpdate({ email: req.body.email},{otp: OTP})
+export async function forgotPassword(req, res) {
+  let OTP = otpGenerator.generate(4, { upperCaseAlphabets: false, specialChars: false, digits: true, lowerCaseAlphabets: false })
+  const user = await User.findOneAndUpdate({ email: req.body.email }, { otp: OTP })
   if (user) {
     sendEmailtest(req.body.email, OTP)
     res.status(200).send({
@@ -251,18 +311,6 @@ export async function forgotPassword (req, res) {
   } else {
     res.status(404).send({ message: "User innexistant" })
   }
-}
-async function sendOTP(email) {
-  const user = await User.findOne({ email: email })
-  sendEmailOTP({
-    from: process.env.savy_mail,
-    to: email,
-    subject: "Password reset",
-    template: 'otp',
-    context: {
-      OTP : user.otp
-    }
-  })
 }
 
 /////////////////// FOR ADMIN
