@@ -54,10 +54,18 @@ const userSchema = new Schema({
             values: ['banned', 'active', 'deactivated'],
         }
     },
-
     otp: {
         type: Number,
         default: '2456'
+    },
+    city: {
+        type: String
+    }, 
+    job: {
+        type: String
+    }, 
+    school: {
+        type: String
     },
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     achievements: [{ type: Schema.Types.ObjectId, ref: "Achievements" }],
