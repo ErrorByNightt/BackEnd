@@ -69,8 +69,8 @@ export async function login(req, res) {
 
 //Update user 
 export async function updateUser(req, res) {
-  const { mail, pseudo, city, job, school } = req.body
-  let user = await user.findOneAndUpdate(
+  const { password, mail, pseudo, city, job, school } = req.body
+  var user = await User.findOneAndUpdate(
     { mail },
     {
       $set: {
@@ -78,7 +78,8 @@ export async function updateUser(req, res) {
         pseudo: pseudo,
         city: city,
         job: job,
-        school: school
+        school: school,
+        password: password
       },
     },
     {
@@ -90,8 +91,9 @@ export async function updateUser(req, res) {
 
 // Send OTP
 export async function sendOTP(req, res) {
-  var email = req.body.mail
+  var email = req.body.email
   const user = await User.findOne({ mail: email })
+  console.log(user)
   let transport = nodemailer.createTransport({
     service: "gmail",
     auth: {
