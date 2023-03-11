@@ -3,6 +3,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import user from './routes/User.route.js';
 import courses from './routes/Courses.route.js';
+import ai from './routes/Ai.route.js';
 
 
 import { NotFoundError, errorHandler } from "./middlewares/error-handler.js";
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 //BSH TESTI 
 app.use("/user", user);
 app.use("/courses", courses);
+app.use("/ai", ai);
 
 app.use(NotFoundError);
 app.use(errorHandler);
