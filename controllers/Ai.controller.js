@@ -93,9 +93,9 @@ export async function solveUCQ(req, res, next) {
             return res.status(404).json({ message: 'UCQ not found' });
         }
         if (ucq.correctAnswer === userAttempt) { // compare the userAttempt with the correctAnswer field
-            return res.json({ message: 'Your attempt is correct!' });
+            return res.status(200).json({ message: 'Your attempt is correct!' });
         } else {
-            return res.json({ message: 'Your attempt is incorrect!' });
+            return res.status(403).json({ message: 'Your attempt is incorrect!' });
         }
     } catch (error) {
         console.error(error);
