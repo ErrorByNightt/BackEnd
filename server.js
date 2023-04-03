@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import user from './routes/User.route.js';
 import courses from './routes/Courses.route.js';
 import ai from './routes/Ai.route.js';
+import code from './routes/Coding.route.js';
 
 
 import { NotFoundError, errorHandler } from "./middlewares/error-handler.js";
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/user", user);
 app.use("/courses", courses);
 app.use("/ai", ai);
+app.use("/code", code);
 
 app.use(NotFoundError);
 app.use(errorHandler);

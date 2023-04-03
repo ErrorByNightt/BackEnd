@@ -1,19 +1,24 @@
-import openai
+import requests
 import json
-import os
-from dotenv import load_dotenv
 
-load_dotenv() # load variables from the .env file
-#api_key = os.getenv("API_KEY")
-api_key = "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"
-openai.api_key = api_key
-response = openai.Completion.create(
-  engine="davinci",
-  prompt="Generate some basic python code",
-  max_tokens=100
+# Make API call and get response
+response = requests.post(
+    "https://api.openai.com/v1/engines/text-davinci-002/completions",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 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",
+    },
+    json={
+        "prompt": "give an easy coding problem in python where you start the problem section with \"Problem :\" and the solution section with \"Solution :\" and the output section with \"Output :\" without an explanation",
+        "max_tokens": 1000,
+        "temperature": 0.5,
+    },
 )
 
-response_dict = json.loads(response.choices[0].text)
-code_block = response_dict['text']
+# Extract code snippet from response
+json_data = json.loads(response.text)
+#print(json_data)
+code_snippet = json_data["choices"][0]["text"]
 
-print(code_block)
+# Print the code snippet
+print(code_snippet)
