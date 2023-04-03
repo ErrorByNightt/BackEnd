@@ -1,10 +1,14 @@
 import openai
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv() # load variables from the .env file
+api_key = os.getenv("API_KEY")
 
 def hint(question):
     # Set up the OpenAI API key
-    openai.api_key = "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"
+    openai.api_key = api_key
 
     # Set the prompt
     prompt = "give me a hint for this question : "+ question +" ."
