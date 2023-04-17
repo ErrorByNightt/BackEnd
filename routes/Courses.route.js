@@ -1,6 +1,6 @@
 import Express from "express";
 
-import * as courseController from '../Controllers/Courses.controller.js'
+import * as courseController from '../controllers/Courses.controller.js'
 import multer from '../middlewares/multer-config-pdf.js';
 
 const router = Express.Router()

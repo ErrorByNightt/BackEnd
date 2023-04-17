@@ -54,6 +54,10 @@ const userSchema = new Schema({
             values: ['banned', 'active', 'deactivated'],
         }
     },
+    dateBanned: {
+        type: Date,
+        default: null,
+      },
     otp: {
         type: Number,
         default: '2456'
