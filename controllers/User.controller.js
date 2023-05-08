@@ -15,7 +15,7 @@ export async function register(req, res, next) {
     return res.status(409).send("User Already exist")
   }
   const user = new User({
-   
+
     userName,
     //image: `${req.protocol}://${req.get('host')}/media/profile/${req.body.image}`,
     mail,
@@ -23,7 +23,7 @@ export async function register(req, res, next) {
     city,
     job,
     school,
-    
+
     otp: parseInt(Math.random() * 10000),
     isVerified: false
   });
@@ -49,7 +49,7 @@ export async function updateImage(req, res) {
   try {
     const user = await User.findOneAndUpdate(
       { _id: req.params.id },
-      { 
+      {
         image: `http://localhost:9095/uploads/${req.file.filename}`
       },
       { new: true } // return the updated user object
@@ -152,7 +152,7 @@ export async function changeUserState(req, res) {
       user.dateBanned = Date.now()
       await user.save()
       return res.status(200).send({ message: 'User banned successfully' })
-     
+
     case 'deactivated':
       user.etat = 'deactivated'
       user.dateBanned = null
@@ -180,36 +180,36 @@ export async function changeUserState(req, res) {
 //get user by id
 export async function getUserById(req, res) {
   console.log(req.params.id);
-        User.findById(req.params.id)
-        .then(result=>{
-          return res.status(200).json({
-                user:result
-            })
-        })
-        .catch(err=> {
-            console.log(err);
-            return res.status(500).json({
-                error:err
-            })
-        })
+  User.findById(req.params.id)
+    .then(result => {
+      return res.status(200).json({
+        user: result
+      })
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      })
+    })
 }
 
 
 //Update user 
 export async function updateUser(req, res) {
-  const {password, mail, pseudo, city, job, school } = req.body
+  const { password, mail, pseudo, city, job, school } = req.body
   var user = await User.findOneAndUpdate(req.params.id,
 
     {
       $set: {
-       
-       mail: mail,
+
+        mail: mail,
         pseudo: pseudo,
         city: city,
         job: job,
         school: school,
         password: password
-            },
+      },
     },
     {
       returnDocument: 'after'
