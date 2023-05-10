@@ -5,8 +5,18 @@ Content-Type: application/json
 {
     "coverImage" : "code.jpg",
     "username" : "user9364606",
+    "comment" : "7",
     "title" : "Python requests: how to convert Percent-encoding to lower cases?",
     "body" : "I am using requests for the website jp.123rf.com. However, I noticed that when URL contains Percent-encodings that are upper cases, e.g., %E9%A3%9B%E8%BA%8D, it will return 302 and ask you to use the lower cases. Then requests will converts the lower cases to upper cases before accessing the new url, resulting in an infinite loop."
+}
+
+###
+
+POST  http://localhost:5000/comment/64453431ad8eb62613581560/comments
+Content-Type: application/json
+
+{
+    "text" : "My first comment"
 }
 
 ###
@@ -54,3 +64,42 @@ Content-Type: application/json
 {
     "coverImage" : "code.jpg"
 }
+###
+
+POST http://localhost:5000/user/register
+Content-Type: application/json
+
+{
+    "userName": "mayssa",
+    "mail": "maymay@gmail.com",
+    "password": "test",
+    "job":"student",
+    "city":"tunis",
+    "school":"esprit"
+}
+     
+###
+POST   http://localhost:5000/user/login
+Content-Type: application/json
+
+{
+    "mail": "maymay@gmail.com",
+    "password": "test"
+}
+###
+
+GET http://localhost:5000/user/645a1ad0233204a76b4a44b7
+Content-Type: application/json
+
+{
+}
+###   
+PUT  http://localhost:5000/user/update/645a1ad0233204a76b4a44b7
+Content-Type: application/json
+
+{
+    "job" : "Etudiant",
+    "city" : "ARIANA",
+    "school" : "ESPRIT"
+}
+     

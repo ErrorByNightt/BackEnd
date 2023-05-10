@@ -10,14 +10,17 @@ const BlogSchema =new Schema({
     
     title: {type: String},
     body: {type: String},
-    coverImage:{type:String,default:"",},
+    coverImage:{type:String},
     like :{
       type: Number,default:0
     },
     share : {type : Number,default:0},
     comment : {type : Number,default:0},
+    comments: [{ type: Schema.Types.ObjectId, ref: 'comment' }],
 
 
   });
 
   export default model("blog", BlogSchema)  
+
+  

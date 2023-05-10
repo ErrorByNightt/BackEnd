@@ -1,4 +1,5 @@
-import BlogPost from '../Models/BlogPost.js';
+import BlogPost from '../models/BlogPost.js';
+import Comment from '../models/Comment.js';
 
 
 export async function ADDBlog(req, res) {
@@ -24,15 +25,10 @@ export async function ADDBlog(req, res) {
   blogpost.title = title
   blogpost.body = body
   blogpost.username = username
-  blogpost.coverImage = `${req.protocol}://${req.get('host')}/blog-files/${req.body.coverImage}`
+  blogpost.coverImage =`${req.protocol}://${req.get('host')}/img/${req.body.coverImage}`
 
-  blogpost.save().then((result) => {
-    res.json({ data: result});
-  })
-  .catch((err) => {
-    console.log(err), res.json({ err: err });
-  });
- // res.status(200).send({ message: "Success", blog: blogpost })
+
+  res.status(200).send({ message: "Success", blog: blogpost })
 
   }
 
@@ -109,4 +105,17 @@ export async function updateImage(req, res) {
     console.error(err);
     res.status(500).json({ error: 'Something went wrong' });
   }
+}
+
+
+
+// Add a new comment to a blog post
+async function addCommentToBlogPost(blogPostId, commentText) {
+  const comment = new Comment({ text: commentText });
+  await comment.save();
+
+  const blogPost = await BlogPost.findById(blogPostId);
+  blogPost.comments.push(comment._id);
+  blogPost.commentCount = blogPost.comments.length;
+  await blogPost.save();
 }

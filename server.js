@@ -6,6 +6,8 @@ import courses from './routes/Courses.route.js';
 import ai from './routes/Ai.route.js';
 import hangman from './routes/Hangman.route.js';
 import blog from './routes/Blog.route.js';
+import comment from './routes/Comment.route.js';
+
 import { v4 as uuidv4 } from 'uuid';
 import {Server} from "socket.io";
 import { createServer } from 'http';
@@ -117,7 +119,9 @@ app.use(cors());
 //bech taati acces lel dossier media li fih les images, localhost:9095/media/fifa.jpg
 //app.use("/media/profile", express.static("media"));
 //app.use("/media/courses", express.static("courses"));
-app.use('/uploads', express.static('media'));
+//app.use('/uploads', express.static('media'));
+app.use('/img', express.static('media'));
+app.use('/uploads', express.static("media"));
 
 
 app.use(express.json());
@@ -185,6 +189,27 @@ socket.on('joinRoom',async({name,roomId})=>{
     console.log(e);
   }
 })
+socket.on('tap',async({index,roomId})=>{
+  try{
+    let room = await Room.findById(roomId);
+    let choice = room.turn.playerType;
+    if(room.turnIndex == 0){
+      room.turn = room.players[1];
+      room.turnIndex=1
+    } else{
+      room.turn = room.players[0];
+      room.turnIndex=0     
+    }
+    room = await room.save();
+    io.to(roomId).emit('tapped',{
+      index,
+      choice,
+      room
+    })
+  } catch (e) {
+    console.log(e);
+  }
+})
 
 
    // const roomId = uuidv4(); // generate a unique ID for the room
@@ -209,7 +234,7 @@ socket.on('joinRoom',async({name,roomId})=>{
   });
 */
   // Disconnect from the server and leave any active room
-  socket.on('disconnect', () => {
+  *socket.on('disconnect', () => {
     for (const [roomId, room] of rooms.entries()) {
       if (room.players.has(socket.id)) {
         room.players.delete(socket.id);
@@ -226,6 +251,8 @@ app.use("/courses", courses);
 app.use("/ai", ai);
 app.use("/hangman", hangman);
 app.use("/blog", blog);
+app.use("/comment", comment);
+
 
 app.use(NotFoundError);
 app.use(errorHandler);
